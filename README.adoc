@@ -183,7 +183,12 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 
 === Testing
 
-To run all the tests, run `bundle exec rspec`.
+To run all the tests, run
+
+[subs=+macros]
+----
++++<span style="pointer-events:none;user-select:none;">$ </span>+++bundle exec rspec
+----
 
 === Pull Requests
 
