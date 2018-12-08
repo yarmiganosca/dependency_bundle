@@ -17,7 +17,7 @@ endif::[]
 
 https://badge.fury.io/rb/dependency_bundle[image:https://badge.fury.io/rb/dependency_bundle.png[Gem Version]]
 https://travis-ci.org/yarmiganosca/dependency_bundle[image:https://secure.travis-ci.org/yarmiganosca/dependency_bundle.png[Build Status]]
-https://coveralls.io/r/yarmiganosca/dependency_bundle[image:https://coveralls.io/repos/yarmiganosca/dependency_bundle/badge.png?branch=master[Test Coverage]]
+https://coveralls.io/github/yarmiganosca/dependency_bundle?branch=master[image:https://coveralls.io/repos/github/yarmiganosca/dependency_bundle/badge.svg?branch=master[Test Coverage]]
 
 toc::[]
 
