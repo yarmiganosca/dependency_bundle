@@ -15,9 +15,9 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-https://badge.fury.io/rb/dependency_bundle[image:https://badge.fury.io/rb/dependency_bundle.png[Gem Version]]
-https://travis-ci.org/yarmiganosca/dependency_bundle[image:https://secure.travis-ci.org/yarmiganosca/dependency_bundle.png[Build Status]]
-https://coveralls.io/github/yarmiganosca/dependency_bundle?branch=master[image:https://coveralls.io/repos/github/yarmiganosca/dependency_bundle/badge.svg?branch=master[Test Coverage]]
+image:https://badge.fury.io/rb/dependency_bundle.svg["Gem Version", link="https://badge.fury.io/rb/dependency_bundle"]
+image:https://travis-ci.org/yarmiganosca/dependency_bundle.svg?branch=master["Build Status", link="https://travis-ci.org/yarmiganosca/dependency_bundle"]
+image:https://coveralls.io/repos/github/yarmiganosca/dependency_bundle/badge.svg?branch=master["Test Coverage", link="https://coveralls.io/github/yarmiganosca/dependency_bundle?branch=master"]
 
 toc::[]
 
