@@ -1,0 +1,221 @@
+= DependencyBundle
+:ext-relative: .adoc
+:source-highlighter: coderay
+:sectanchors:
+:linkattrs:
+:icons: font
+:toc: macro
+:toclevels: 3
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+http://badge.fury.io/rb/dependency_bundle[image:https://badge.fury.io/rb/dependency_bundle.png[Gem Version]]
+http://travis-ci.org/yarmiganosca/dependency_bundle[image:https://secure.travis-ci.org/yarmiganosca/dependency_bundle.png[Build Status]]
+
+toc::[]
+
+== Overview
+
+DependencyBundle helps you write Dependency Injected code without a Global Dependency Registry or a Dependency Injection Framework, because:
+
+* Global Dependency Registries are bad for all the same reasons regular globals are bad (which we're trying to get away from with DI in the first place!).
+* Dependency Injection Frameworks aren't bad, but they are heavy, and aren't necessary in all situations where you want DI.
+
+Instead, DependencyBundle is a Depedency Registry that's designed to be injected. Using it is simple. Here's an a Dependency Bundle with just a logger:
+
+[source,ruby]
+----
+require 'dependency_bundle'
+
+deps = DependencyBundle.new do
+  set :logger, Logger.new(self.stdout) # self is the DependencyBundle instance
+                                       # by default, DependencyBundle instances come with:
+                                       #   :env    -> the ENV global
+                                       #   :stdin  -> the STDIN global
+                                       #   :stdout -> the STDOUT global
+                                       #   :stderr -> the STDERR global
+end
+----
+
+But building your entire codebase around it is even better.
+
+== Using DependencyBundle
+
+Let's say you've got a report that gets run every morning. It:
+
+. makes some HTTP API requests
+. does some math on the results of those requests
+. caches the result on a Memcache instance
+. emails the attendees of a standing morning meeting
+
+Assuming you don't need any dependencies for the computation itself, you've got these dependencies:
+
+* HTTP Client
+* Memcache Client
+* Mailer
+* Logger (not mentioned explicitly, but you always need one)
+
+So your bundle would look something like this:
+
+[source,ruby]
+----
+require 'dependency_bundle'
+
+deps = DependencyBundle.new do
+  set :logger, Logger.new(self.stdout)         # each DependencyBundle has stdout by default
+  set :mailer, Mailer(deps: self)              # which needs a logger
+  set :http_client, HTTPClient.new(deps: self) # also needs a logger
+  set :memcache_client, MemcacheClient.new(
+    host: "cache.example.com",                 # needs a host to connect to
+    deps: self                                 # needs a logger
+  )
+end
+----
+
+and your report class might look like this:
+
+[source,ruby]
+----
+class MorningMeetingReport
+  def initialize(deps:, date: Date.today.prev_day)
+    # One of DependencyBundle's best features is dependency verification.
+    # It allows us to:
+    #   * Discover during testing if we have unsatisfied class dependencies
+    #   * Document the dependencies of our classes
+    deps.verify_dependencies!(:logger, :http_client, :memcache_client, :mailer)
+
+    @deps = deps
+    @date = date
+  end
+
+  def generate
+    # collect data with @deps.http_client
+  end
+
+  def store
+    # cache report with @deps.memcache_client
+  end
+
+  def notify
+    # email attendees with @deps.mailer
+  end
+end
+----
+
+If you design entire programs this way,
+
+* adding new dependencies is easy
+* testing your code's response to failures is simple
+
+=== Testing with DependencyBundle
+
+Testing your code with Dependency Bundles is also easy! Build `DependencyBundle` instances in your setup steps, and instantiate your test subjects with them. As an example, if we use the above code and RSpec doubles, it'll look something like this:
+
+[source,ruby]
+----
+RSpec.describe MorningMeetingReport do
+  let(:deps) do
+    set :logger, Logger.new(StringIO.new)
+    set :mailer, instance_double('Mailer')
+    set :http_client, instance_double('HTTPClient')
+    set :memcache_client, instance_double('MemcacheClient')
+  end
+
+  context 'happy path' do
+    before do
+      allow(deps.http_client).to receive(:get).with(url).and_return(fixture)
+      allow(deps.memcache_client).to receive(:set).with(key, value).and_return(true)
+      allow(deps.mailer).to receive(:send_mail).and_return(true)
+    end
+
+    # ...
+  end
+
+  # ...
+end
+----
+
+== Installation
+
+Add this line to your application's Gemfile:
+
+[source,ruby]
+----
+gem 'dependency_bundle'
+----
+
+And then execute:
+
+[subs=+macros]
+----
++++<span style="pointer-events:none;user-select:none;">$ </span>+++bundle install
+----
+
+Or install it yourself as:
+
+[subs=+macros]
+----
++++<span style="pointer-events:none;user-select:none;">$ </span>+++gem install dependency_bundle
+----
+
+== Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/yarmiganosca/dependency_bundle
+
+[IMPORTANT]
+.Code of Conduct
+====
+This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the http://contributor-covenant.org[Contributor Convenant] code of conduct.
+====
+
+=== Development
+
+After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+
+To install this gem onto your local machine, run `bundle exec rake install`.
+
+=== Testing
+
+To run all the tests, run `bundle exec rspec`.
+
+=== Pull Requests
+
+Pull requests should be well-scoped and include tests appropriate to the changes.
+
+When submitting a pull request that changes user-facing behavior, add release note lines to the commit message body http://github.com/yarmiganosca/structured_changelog#with-multiple-contributors[like this]. You can preview your release lines by running
+
+[subs=+macros]
+----
++++<span style="pointer-events:none;user-select:none;">$ </span>+++bundle exec rake changelog:preview
+----
+
+=== Releases
+
+Releasing a new version is a 2-step process.
+
+First, run
+
+[subs=+macros]
+----
++++<span style="pointer-events:none;user-select:none;">$ </span>+++bundle exec rake changelog:compile
+----
+
+This will add a new release section before the other release sections. It will contain all the release notes in the commit messages since the last release, and will be prepopulated with the minimum possible version given those changes. Proof-read it and reorder the notes if you think doing so would be necessary or clearer. Feel free to increase the version if necessary (to force a major release, for example).
+
+Once you're satisfied, run
+
+[subs=+macros]
+----
++++<span style="pointer-events:none;user-select:none;">$ </span>+++bundle exec rake changelog:release
+----
+
+This will create a git tag for the version, push git commits and tags, and push the `.gem` file to https://rubygems.org[rubygems.org].
+
+== License
+
+The gem is available as open source under the terms of the https://opensource.org/licenses/MIT[MIT License].
