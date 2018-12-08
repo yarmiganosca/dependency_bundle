@@ -1,6 +1,6 @@
 require 'rspec_config'
 
-require 'simplecov'
-SimpleCov.start
+require 'coveralls'
+Coveralls.wear!
 
 require "dependency_bundle"
