@@ -5,6 +5,7 @@
 :linkattrs:
 :icons: font
 :toc: macro
+:toc-title:
 :toclevels: 3
 ifdef::env-github[]
 :tip-caption: :bulb:
