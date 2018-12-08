@@ -14,8 +14,9 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-http://badge.fury.io/rb/dependency_bundle[image:https://badge.fury.io/rb/dependency_bundle.png[Gem Version]]
-http://travis-ci.org/yarmiganosca/dependency_bundle[image:https://secure.travis-ci.org/yarmiganosca/dependency_bundle.png[Build Status]]
+https://badge.fury.io/rb/dependency_bundle[image:https://badge.fury.io/rb/dependency_bundle.png[Gem Version]]
+https://travis-ci.org/yarmiganosca/dependency_bundle[image:https://secure.travis-ci.org/yarmiganosca/dependency_bundle.png[Build Status]]
+https://coveralls.io/r/yarmiganosca/dependency_bundle[image:https://coveralls.io/repos/yarmiganosca/dependency_bundle/badge.png?branch=master[Test Coverage]]
 
 toc::[]
 
