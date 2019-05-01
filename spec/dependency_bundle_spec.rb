@@ -65,7 +65,7 @@ RSpec.describe DependencyBundle do
         }.to raise_error(ArgumentError)
       end
     end
-    
+
     context 'when all of the dependencies are provided' do
       subject(:deps) do
         described_class.new do
@@ -87,7 +87,7 @@ RSpec.describe DependencyBundle do
           set :x, 4
         end
       end
-      
+
       it 'raises an error mentioning the dependencies not provided' do
         expect {
           deps.verify_dependencies!(:x, :y)
