@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    dependency_bundle (0.1.0)
+    dependency_bundle (1.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -65,4 +65,4 @@ DEPENDENCIES
   structured_changelog
 
 BUNDLED WITH
-   1.16.1
+   1.17.3
