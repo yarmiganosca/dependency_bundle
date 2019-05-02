@@ -1,0 +1,7 @@
+before_script:
+  - gem install bundler -v '< 2'
+  - bundle install
+
+rspec:
+  image: ruby:2.5.1
+  script: bundle exec rspec
