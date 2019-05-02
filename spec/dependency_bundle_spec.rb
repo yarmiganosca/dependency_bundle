@@ -3,7 +3,7 @@ RSpec.describe DependencyBundle do
 
   describe '#set' do
     it 'defines a method named with the provided key that returns the provided value' do
-      deps.set :x, 5
+      deps.set(x: 5)
 
       expect(deps.x).to eq 5
     end
@@ -11,7 +11,7 @@ RSpec.describe DependencyBundle do
     context 'with a global' do
       before do
         ::X = {}
-        deps.set :x, X
+        deps.set(x: X)
       end
 
       it 'reflects changes made to the global after instantiation' do
@@ -27,11 +27,11 @@ RSpec.describe DependencyBundle do
     end
 
     context "when something with that name already exists" do
-      before { deps.set :already_exists, 5 }
+      before { deps.set(already_exists: 5) }
 
       it "raises an exception indicataing it can't override existing methods" do
         expect {
-          deps.set :already_exists, 4
+          deps.set(already_exists: 4)
         }.to raise_error DependencyBundle::OverrideAttempted, /:already_exists/
       end
     end
@@ -68,10 +68,7 @@ RSpec.describe DependencyBundle do
 
     context 'when all of the dependencies are provided' do
       subject(:deps) do
-        described_class.new do
-          set :x, 4
-          set :y, 5
-        end
+        described_class.new(x: 4, y: 5)
       end
 
       it "doesn't raise an error" do
@@ -83,9 +80,7 @@ RSpec.describe DependencyBundle do
 
     context 'when some of the dependencies are provided' do
       subject(:deps) do
-        described_class.new do
-          set :x, 4
-        end
+        described_class.new(x: 4)
       end
 
       it 'raises an error mentioning the dependencies not provided' do

@@ -34,14 +34,14 @@ Instead, DependencyBundle is a Depedency Registry that's designed to be injected
 ----
 require 'dependency_bundle'
 
-deps = DependencyBundle.new do
-  set :logger, Logger.new(self.stdout) # self is the DependencyBundle instance
-                                       # by default, DependencyBundle instances come with:
-                                       #   :env    -> the ENV global
-                                       #   :stdin  -> the STDIN global
-                                       #   :stdout -> the STDOUT global
-                                       #   :stderr -> the STDERR global
-end
+deps = DependencyBundle.new
+# by default, DependencyBundle instances also come with:
+#   .env    -> the ENV global
+#   .stdin  -> the STDIN global
+#   .stdout -> the STDOUT global
+#   .stderr -> the STDERR global
+
+deps.set(logger: Logger.new(deps.stdout))
 ----
 
 But building your entire codebase around it is even better.
@@ -68,14 +68,17 @@ So your bundle would look something like this:
 ----
 require 'dependency_bundle'
 
-deps = DependencyBundle.new do
-  set :logger, Logger.new(self.stdout)         # each DependencyBundle has stdout by default
-  set :mailer, Mailer(deps: self)              # which needs a logger
-  set :http_client, HTTPClient.new(deps: self) # also needs a logger
-  set :memcache_client, MemcacheClient.new(
-    host: "cache.example.com",                 # needs a host to connect to
-    deps: self                                 # needs a logger
+deps = DependencyBundle.new
+
+deps.set(logger: Logger.new(self.stdout))      # default DependencyBundle stdout
+deps.set(
+  mailer:          Mailer(deps: self)),         # Mailer needs a logger, so we inject deps into it
+  http_client:     HTTPClient.new(deps: self)), # the HTTPClient also needs a logger
+  memcache_client: MemcacheClient.new(          # MemcacheClient needs:
+    host: "cache.example.com",                  #   a host to connect to
+    deps: self                                  #   a logger, which we again get from our DependencyBundle
   )
+)
 end
 ----
 
@@ -122,10 +125,12 @@ Testing your code with Dependency Bundles is also easy! Build `DependencyBundle`
 ----
 RSpec.describe MorningMeetingReport do
   let(:deps) do
-    set :logger, Logger.new(StringIO.new)
-    set :mailer, instance_double('Mailer')
-    set :http_client, instance_double('HTTPClient')
-    set :memcache_client, instance_double('MemcacheClient')
+    DependencyBundle.new(
+      logger: Logger.new(StringIO.new),
+      mailer: instance_double("Mailer"),
+      http_client: instance_double('HTTPClient'),
+      memcache_client: instance_double('MemcacheClient')
+    )
   end
 
   context 'happy path' do
